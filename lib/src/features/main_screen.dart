@@ -17,26 +17,29 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Column(
-            children: [
-              const TextField(
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: "Postleitzahl"),
-              ),
-              const SizedBox(height: 32),
-              OutlinedButton(
-                onPressed: () {
-                  // TODO: implementiere Suche
-                },
-                child: const Text("Suche"),
-              ),
-              const SizedBox(height: 32),
-              Text("Ergebnis: Noch keine PLZ gesucht",
-                  style: Theme.of(context).textTheme.labelLarge),
-            ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const TextField(
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), labelText: "Postleitzahl"),
+                ),
+                const SizedBox(height: 32),
+                OutlinedButton(
+                  onPressed: () {
+                    // TODO: implementiere Suche
+                  },
+                  child: const Text("Suche"),
+                ),
+                const SizedBox(height: 32),
+                Text("Ergebnis: Noch keine PLZ gesucht",
+                    style: Theme.of(context).textTheme.labelLarge),
+              ],
+            ),
           ),
         ),
       ),
