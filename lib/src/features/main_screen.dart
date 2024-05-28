@@ -11,45 +11,23 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: initiate controllers
+    zipController;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const TextField(
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: "Postleitzahl"),
-                ),
-                const SizedBox(height: 32),
-                OutlinedButton(
-                  onPressed: () {
-                    // TODO: implementiere Suche
-                  },
-                  child: const Text("Suche"),
-                ),
-                const SizedBox(height: 32),
-                Text("Ergebnis: Noch keine PLZ gesucht",
-                    style: Theme.of(context).textTheme.labelLarge),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  String? city;
+  final zipController = TextEditingController();
 
-  @override
-  void dispose() {
-    // TODO: dispose controllers
-    super.dispose();
+  String? validateZip(String? input) {
+    int? inputInt = int.tryParse(input!);
+    if (input.isEmpty) {
+      return "Bitte teilen Sie Ihr PLZ";
+    } else if (input.length != 5) {
+      return "PLZ muss 5 stellig sein";
+    } else if (inputInt.runtimeType != int) {
+      return "PLZ darf nur Ziffern enthalten";
+    } else {
+      return null;
+    }
   }
 
   Future<String> getCityFromZip(String zip) async {
@@ -71,5 +49,64 @@ class _MainScreenState extends State<MainScreen> {
       default:
         return 'Unbekannte Stadt';
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: zipController,
+                  validator: validateZip,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Postleitzahl",
+                    suffixText: '*',
+                    suffixStyle: TextStyle(color: Colors.red),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                OutlinedButton(
+                  onPressed: () async {
+                    city = await getCityFromZip(zipController.text);
+                    setState(() {});
+                  },
+                  child: const Text("Stadt abfragen"),
+                ),
+                const SizedBox(height: 32),
+                FutureBuilder<String>(
+                  future: getCityFromZip(zipController.text),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData &&
+                        snapshot.connectionState == ConnectionState.done) {
+                      return Text("Stadt: ${snapshot.data}");
+                    } else if (snapshot.connectionState !=
+                        ConnectionState.done) {
+                      return const CircularProgressIndicator();
+                    } else {
+                      return const Icon(Icons.error);
+                    }
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    zipController;
+    super.dispose();
   }
 }
